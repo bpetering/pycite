@@ -240,13 +240,12 @@ class Author:
     def __str__(self):
         if self.lastname:
             if self.initials:
-                return self._to_initials(self.firstname) + ' ' + self.lastname
+                return self._to_initials(self.firstname) + self.lastname
             else:
                 return self.firstname + ' ' + self.lastname
         else:
             if self.initials:
-                return '. '.join([self._to_initials(x) for x in self.name.split()[:-1]) 
-                        + ' ' + self.name.split()[-1]
+                return '. '.join([self._to_initials(x) for x in self.name.split()[:-1]]) + self.name.split()[-1]
             else:
                 return self.name
 

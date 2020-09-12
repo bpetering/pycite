@@ -1,6 +1,12 @@
 import unittest
 from cite import Cite, Author, PageRange
 
+class TestAuthor(unittest.TestCase):
+    def test_author(self):
+        a = Author('James Brown')
+        self.assertEqual(str(a), 'James Brown')
+        self.assertEqual(list(reversed(a)), ['Brown', 'James'])
+
 # https://guides.lib.uw.edu/c.php?g=341448&p=4076094
 class TestToMLA(unittest.TestCase):
 
