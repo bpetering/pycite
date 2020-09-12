@@ -39,12 +39,14 @@ class Cite:
     }
 
     # Plural properties are lists
-    def __init__(self, title, authors=None, page_ranges=None, city=None, publisher=None, year=None,
+    def __init__(self, title, subtitle=None, authors=None, page_ranges=None, 
+                    city=None, publisher=None, year=None,
                     larger_title=None, larger_authors=None, larger_authors_role=None,
                     volume=None, issue=None, date=None, url=None, retrieved_date=None,
                     markup=MARKUP_NONE):
         # Careful when adding new attributes because of __setattr__()
         self.title = title
+        self.subtitle = subtitle
         self.authors = authors
         self.page_ranges = page_ranges
         self.city = city
@@ -65,7 +67,7 @@ class Cite:
         self.markup = markup
 
     def __setattr__(self, name, value):
-        supported    = ['title', 'authors', 'page_ranges', 'city', 'publisher', 'year', 
+        supported    = ['title', 'subtitle', 'authors', 'page_ranges', 'city', 'publisher', 'year', 
                         'larger_title', 'larger_authors', 'larger_authors_role', 
                         'volume', 'issue', 'date', 'url', 'retrieved_date', 
                         'markup']
