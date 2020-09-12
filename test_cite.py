@@ -76,12 +76,25 @@ class TestToMLA(unittest.TestCase):
 
 # https://apastyle.apa.org/
 class TestToAPA(unittest.TestCase):
+    def test_book(self):
+        cite = Cite('How to eat friends and barbecue people', authors='Hannibal Lecter', year=1989, 
+                    publisher='Carne Press')
+        self.assertEqual(cite.to_apa(), 'Lecter, H. (1989). How to eat friends and barbecue people. Carne Press.')
+        cite.markup = Cite.MARKUP_HTML
+        self.assertEqual(cite.to_apa(), 'Lecter, H. (1989). <em>How to eat friends and barbecue people.</em> Carne Press.')
+
+    def test_book_many_authors(self):
+        cite = Cite('Chainsaw Juggling for Beginners', 
+                authors=[Author('James F. Fredrickson'), 'Bob Tweedle', Author('F. Maria Juanita Lopez')],
+                year=2000, publisher='Inadvisable Press', city='Denmark', markup=Cite.MARKUP_MARKDOWN)
+        self.assertEqual(cite.to_apa(), 'Fredrickson, J. F., Tweedle, B., & Lopez, F. M. J. (2000). *Chainsaw Juggling for Beginners.* Denmark: Inadvisable Press.')
+
     def test_journal(self):
         cite = Cite(title='Wigwams in Timbuktu: Dispersion data and comparisons with previous work',
                 authors=Author('David Frederick Livingston'), in_title='Wigwam Studies', 
                     volume=10, issue=2, pages=PageRange(15,22), year=2011,
                     url='https://doi.org/12345.6789/ws0001234', markup=Cite.MARKUP_MARKDOWN)
-        self.assertEqual(cite.to_apa(), 'Livingston, D.F. (2011) Wigwams in Timbuktu: Dispersion data and comparisons with previous work. *Wigwam Studies, 8*(2), 15-22. https://doi.org/12345.6789/ws0001234')
+        self.assertEqual(cite.to_apa(), 'Livingston, D. F. (2011). Wigwams in Timbuktu: Dispersion data and comparisons with previous work. *Wigwam Studies, 10*(2), 15-22. https://doi.org/12345.6789/ws0001234')
 
 
 if __name__ == '__main__':

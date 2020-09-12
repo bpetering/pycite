@@ -82,9 +82,10 @@ class Cite:
             if type(value) is not list:
                 value = [value]
         if name == 'authors':
-            for a in value:
-                if type(a) is str:
-                    a = Author(a)
+            for idx, a in enumerate(value):
+                if type(a) is not Author:
+                    author = Author(a)
+                    value[idx] = author
         if name == 'pages':
             for idx, elem in enumerate(value):
                 if type(elem) is not PageRange:
@@ -94,7 +95,7 @@ class Cite:
 
 
     def to_mla(self):
-        in_larger = bool(self.in_title or self.in_subtitle or self.in_authors)
+        in_larger = bool(self.in_title or self.in_authors)
         output = ''
         if self.authors:
             except_final_authors = self.authors[:-1]
@@ -196,12 +197,63 @@ class Cite:
 
     def to_apa(self):
         output = ''
-        
+        in_larger = bool(self.in_title or self.in_authors)
+
         if self.authors:
-            authors_copy = [reversed(x) for x in self.authors]
-            for idx, a in authors_copy:
-                authors_copy[idx].initials = True
-            output += ', '.join(authors_copy)
+            tmp_copy = [x for x in self.authors]
+            for idx, _ in enumerate(tmp_copy):
+                tmp_copy[idx].initials = True
+            authors_reversed_copy = [reversed(x) for x in tmp_copy]
+            output += ', '.join([str(x) for x in authors_reversed_copy[:-1]])
+            if len(self.authors) > 1:
+                output += ', & ' 
+            output += str(authors_reversed_copy[-1])
+
+        if self.year:
+            output += ' (' + str(self.year) + ').'
+        elif self.date:
+            output += ' (' + str(self.date.year) + ').'
+
+        output += ' '
+        if not in_larger: 
+            output += self.OPENING_ITALICS[self.markup]
+        output += self.title
+        if self.subtitle:
+            output += ': ' + self.subtitle
+        output += '.'
+        if not in_larger:
+            output += self.CLOSING_ITALICS[self.markup]
+
+        if self.city or self.publisher:
+            output += ' '
+        if self.city:
+            output += self.city
+            if self.publisher:
+                output += ': '
+            else:
+                output += '.'
+        if self.publisher:
+            output += self.publisher + '.'
+
+        if in_larger:
+            output += ' '
+            output += self.OPENING_ITALICS[self.markup]
+            output += self.in_title
+            if self.in_subtitle:
+                output += ': ' + self.in_subtitle
+            if self.volume:
+                output += ', ' + str(self.volume)
+            output += self.CLOSING_ITALICS[self.markup]
+            if self.issue:
+                output += '(' + str(self.issue) + ')'
+                if self.pages:
+                    output += ', '
+        if self.pages:
+            output += ', '.join([str(x) for x in self.pages])
+            output += '.'
+
+        if self.url:
+            output += ' ' + self.url
 
         return output 
 
