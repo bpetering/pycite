@@ -199,32 +199,6 @@ class Cite:
         return output 
 
 
-class AuthorReversedIter:
-    def __init__(self, author):
-        self.i = 0
-        self.chunks_len = 0
-
-        if author.lastname:
-            self.name_chunks = [author.lastname, author.firstname]
-            self.chunks_len = 2
-        else:
-            tmp = author.name.split()
-            self.name_chunks = [tmp[-1]]
-            for chunk in tmp[:-1]:
-                self.name_chunks.append(chunk)
-            self.chunks_len = len(self.name_chunks)
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.i < self.chunks_len:
-            self.i += 1
-            return self.name_chunks[self.i-1]
-        else:
-            raise StopIteration()
-
-
 # https://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/
 class Author:
     """Class for an author"""
@@ -240,20 +214,34 @@ class Author:
     def __str__(self):
         if self.lastname:
             if self.initials:
-                return self._to_initials(self.firstname) + self.lastname
+                return self._to_initials(self.firstname) + ' ' + self.lastname
             else:
                 return self.firstname + ' ' + self.lastname
         else:
             if self.initials:
-                return '. '.join([self._to_initials(x) for x in self.name.split()[:-1]]) + self.name.split()[-1]
+                return ' '.join([self._to_initials(x) for x in self.name.split()[:-1]]) + ' ' + self.name.split()[-1]
             else:
                 return self.name
 
     def __reversed__(self):
-        return AuthorReversedIter(self)
+        if self.lastname:
+            tmp = [self.lastname]
+            if self.initials:
+                tmp.append(self._to_initials(self.firstname))
+            else:
+                tmp.append(self.firstname)
+        else:
+            tmp = list(reversed(self.name.split()))
+            if self.initials:
+                for idx, chunk in enumerate(tmp[1:]):
+                    tmp[idx] = self._to_initials(chunk)
+        return iter(tmp)
 
     def _to_initials(self, components):
-        return '. '.join([upper(x[0]) for x in components])
+        if type(components) is not list:
+            components = [components]
+        tmp = [x[0].upper() + '.' for x in components]
+        return ' '.join(tmp) 
 
 
 class PageRange:
