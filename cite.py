@@ -1,5 +1,22 @@
 import datetime
 
+# Types of referencing:
+# Chicago
+# - Author-Date
+# - Notes-Bibliography
+#
+# MLA
+# 
+# APA
+#
+# IEEE
+#
+# ASA
+
+# Distinctions: Version (e.g. APA 6th vs 7th), Subtype (Chicago Author-Date vs Notes-Bibliography),
+#  In-text vs page footnote vs end-of-document reference list, 
+# 
+
 class Cite:
     """Class for any type of citation."""
 
