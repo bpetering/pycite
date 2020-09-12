@@ -52,30 +52,36 @@ class TestToMLA(unittest.TestCase):
         self.assertEqual(cite.to_mla(), 'Davis, Cynthia, and Brown, Jack. <em>Landscape Gardening.</em> Wiley & Sons, 1994.');
 
 
-    def test_larger_anthology(self):
+    def test_anthology(self):
         bs = Author('Bob Smith')
         sp = Author('Sheila Pearson')
         jm = Author('James McDonald')
         nt = Author('Neil Tavistock')
         cite = Cite(title='Incan Mythology', authors=[bs, sp, jm], publisher='Macmillan', year=2002, 
-                    larger_title='All the Worlds Mythology', larger_authors=nt)
+                    in_title='All the Worlds Mythology', in_authors=nt)
         self.assertEqual(cite.to_mla(), 'Smith, Bob, Pearson, Sheila, and McDonald, James. "Incan Mythology." All the Worlds Mythology. Neil Tavistock. Macmillan, 2002.')
         self.assertEqual(cite.to_mla(), 'Smith, Bob, Pearson, Sheila, and McDonald, James. "Incan Mythology." All the Worlds Mythology. Neil Tavistock. Macmillan, 2002.')
 
-        cite.page_ranges=PageRange(25, 31)
+        cite.pages=PageRange(25, 31)
         cite.markup = Cite.MARKUP_HTML
         self.assertEqual(cite.to_mla(), 'Smith, Bob, Pearson, Sheila, and McDonald, James. &ldquo;Incan Mythology.&rdquo; <em>All the Worlds Mythology.</em> Neil Tavistock. Macmillan, 2002. pp. 25-31.')
 
-        cite.page_ranges=[PageRange(10, 20), '25-40', 96, '129 - 132']
+        cite.pages=[PageRange(10, 20), '25-40', 96, '129 - 132']
         cite.markup = Cite.MARKUP_MARKDOWN
-        cite.larger_authors_role = 'Edited by'
+        cite.in_authors_role = 'Edited by'
         cite.subtitle = 'New Perspectives'
-        cite.larger_subtitle = 'Historical, Religious, and Ethnographical'
+        cite.in_subtitle = 'Historical, Religious, and Ethnographical'
         self.assertEqual(cite.to_mla(), 'Smith, Bob, Pearson, Sheila, and McDonald, James. "Incan Mythology: New Perspectives." *All the Worlds Mythology: Historical, Religious, and Ethnographical.* Edited by Neil Tavistock. Macmillan, 2002. pp. 10-20, 25-40, 96, 129-132.')
 
 
 # https://apastyle.apa.org/
-# class TestToAPA(unittest.TestCase)
+class TestToAPA(unittest.TestCase):
+    def test_journal(self):
+        cite = Cite(title='Wigwams in Timbuktu: Dispersion data and comparisons with previous work',
+                authors=Author('David Frederick Livingston'), in_title='Wigwam Studies', 
+                    volume=10, issue=2, pages=PageRange(15,22), year=2011,
+                    url='https://doi.org/12345.6789/ws0001234', markup=Cite.MARKUP_MARKDOWN)
+        self.assertEqual(cite.to_apa(), 'Livingston, D.F. (2011) Wigwams in Timbuktu: Dispersion data and comparisons with previous work. *Wigwam Studies, 8*(2), 15-22. https://doi.org/12345.6789/ws0001234')
 
 
 if __name__ == '__main__':

@@ -19,6 +19,11 @@ import datetime
 
 class Cite:
     """Class for any type of citation."""
+    SUPPORTED_ATTRS = ('title', 'subtitle', 'authors', 'pages',
+                    'city', 'publisher', 'year', 
+                    'in_title', 'in_subtitle', 'in_authors', 'in_authors_role', 
+                    'journal', 'volume', 'issue', 'date', 'url', 'retrieved_date', 
+                    'markup')
 
     MARKUP_NONE = 0
     MARKUP_MARKDOWN = 1
@@ -39,32 +44,25 @@ class Cite:
     }
 
     # Plural properties are lists
-    def __init__(self, title, subtitle=None, authors=None, author=None, page_ranges=None, pages=None,
+    def __init__(self, title, subtitle=None, authors=None, pages=None,
                     city=None, publisher=None, year=None,
-                    larger_title=None, larger_subtitle=None, larger_authors=None, 
-                    larger_author=None, larger_authors_role=None, journal=None,
+                    in_title=None, in_subtitle=None, in_authors=None, in_authors_role=None, 
                     volume=None, issue=None, date=None, url=None, retrieved_date=None,
                     markup=MARKUP_NONE):
         # Careful when adding new attributes because of __setattr__()
         self.title = title
         self.subtitle = subtitle
         self.authors = authors
-        if not authors and author:
-            self.authors = [author]
-        self.page_ranges = page_ranges
+        self.pages = pages
         self.city = city
         self.publisher = publisher
         self.year = year
 
-        # Part of a larger work - a journal, an edited book/anthology, a website
-        self.larger_title = larger_title
-        if not larger_title and journal:
-            self.larger_title = journal
-        self.larger_subtitle = larger_subtitle
-        self.larger_authors = larger_authors
-        if not larger_authors and larger_author:
-            self.larger_authors = [larger_author]
-        self.larger_authors_role = larger_authors_role
+        # Whatever contains this work - a newspaper, journal, an edited book/anthology, a website
+        self.in_title = in_title
+        self.in_subtitle = in_subtitle
+        self.in_authors = in_authors
+        self.in_authors_role = in_authors_role
 
         self.volume = volume
         self.issue = issue
@@ -75,32 +73,28 @@ class Cite:
         self.markup = markup
 
     def __setattr__(self, name, value):
-        supported    = ['title', 'subtitle', 'authors', 'page_ranges', 'city', 'publisher', 'year', 
-                        'larger_title', 'larger_subtitle', 'larger_authors', 'larger_authors_role', 
-                        'volume', 'issue', 'date', 'url', 'retrieved_date', 
-                        'markup']
-        if name not in supported:
-            raise AttributeError("The property '{}' is unsupported. Supported properties: {}".format(
-                name, ' '.join(supported)))
+        if name not in self.SUPPORTED_ATTRS:
+            raise AttributeError("The attribute '{}' is unsupported. Supported attributes: {}".format(
+                name, ' '.join(self.SUPPORTED_ATTRS)))
         if name[-1] == 's':
             if value is None:
                 value = []
             if type(value) is not list:
                 value = [value]
-        if name == 'authors' or name == 'larger_authors':
+        if name == 'authors':
             for a in value:
                 if type(a) is str:
                     a = Author(a)
-        if name == 'page_ranges':
+        if name == 'pages':
             for idx, elem in enumerate(value):
                 if type(elem) is not PageRange:
                     pr = PageRange(elem)
                     value[idx] = pr
         super().__setattr__(name, value)
 
+
     def to_mla(self):
-        in_larger = bool(self.larger_title or self.larger_subtitle 
-                         or self.larger_authors or self.larger_authors_role)
+        in_larger = bool(self.in_title or self.in_subtitle or self.in_authors)
         output = ''
         if self.authors:
             except_final_authors = self.authors[:-1]
@@ -142,18 +136,18 @@ class Cite:
         if in_larger:
             output += ' '
             output += self.OPENING_ITALICS[self.markup]
-            output += self.larger_title
-            if self.larger_subtitle:
-                output += ': ' + self.larger_subtitle
+            output += self.in_title
+            if self.in_subtitle:
+                output += ': ' + self.in_subtitle
             output += '.'
             output += self.CLOSING_ITALICS[self.markup]
 
-        if self.larger_authors_role and self.larger_authors:
+        if self.in_authors_role and self.in_authors:
             output += ' '
-            output += self.larger_authors_role
-        if self.larger_authors:
+            output += self.in_authors_role
+        if self.in_authors:
             output += ' '
-            except_final_authors = self.larger_authors[:-1]
+            except_final_authors = self.in_authors[:-1]
             efa_len = len(except_final_authors)
             for idx, author in enumerate(except_final_authors):
                 output += str(author)
@@ -161,7 +155,7 @@ class Cite:
                     output += ', '
                 elif idx < efa_len - 1:
                     output += ', and '
-            output += str(self.larger_authors[-1])
+            output += str(self.in_authors[-1])
             output += '.'
 
         if self.city:
@@ -183,15 +177,15 @@ class Cite:
         elif self.date:
             output += ' ' + str(self.date.year) + '.'
 
-        if self.page_ranges:
+        if self.pages:
             output += ' '
-            pr_len = len(self.page_ranges)
-            if pr_len == 1 and len(self.page_ranges[0]) == 1:
+            pages_len = len(self.pages)
+            if pages_len == 1 and len(self.pages[0]) == 1:
                 output += self.PAGE_ABBREV + '. '
             else:
                 output += self.PAGES_ABBREV + '. '
-            for idx, pr in enumerate(self.page_ranges):
-                if idx < pr_len - 1:
+            for idx, pr in enumerate(self.pages):
+                if idx < pages_len - 1:
                     output += str(pr) + ', '
                 else:
                     output += str(pr)
@@ -204,9 +198,11 @@ class Cite:
         output = ''
         
         if self.authors:
-            for author in self.authors:
-                author.initials=True
-                
+            authors_copy = [reversed(x) for x in self.authors]
+            for idx, a in authors_copy:
+                authors_copy[idx].initials = True
+            output += ', '.join(authors_copy)
+
         return output 
 
 
@@ -304,19 +300,29 @@ class Author:
 
 
 class PageRange:
-    """A 'range' analogue that support ordering (by .start), and has [start,stop] semantics
-       (includes 'stop' value)"""
+    """A 'range' analogue that support ordering (by .begin), and has [begin,end] semantics
+       (includes 'end' value).
 
-    def __init__(self, start, stop=None, step=1):
-        if type(start) is str:
-            tmp = start.split('-')
-            if len(tmp) < 2:
-                raise TypeError("Bad string argument to PageRange(): Needs form 'x - y'")
-            start = int(tmp[0])
-            stop = int(tmp[1])
-        if stop is None:
-            stop = start
-        self.r = range(start, stop + 1, step)
+       Differences to range():
+        * no 'step'
+        * 'begin' and 'end' to make clear the difference from range()
+        * [begin, end] semantics, not [start, stop) semantics ('end' value included)
+        * len(PageRange(x)) == 1
+        * PageRanges are comparable to each other and to integers based on .begin
+    """
+
+    def __init__(self, begin, end=None):
+        # Handle various string formats
+        if type(begin) is str:
+            if '-' in begin:
+                tmp = begin.split('-')
+                if len(tmp) < 2:
+                    raise TypeError("Bad string argument to PageRange(): Needs form 'x - y'")
+                begin = int(tmp[0])
+                end = int(tmp[1])
+        if end is None:
+            end = begin
+        self.r = range(begin, end + 1)
 
     def __repr__(self):
         if self.r.step != 1:
@@ -334,6 +340,13 @@ class PageRange:
         else:
             return str(self.r.start)
 
+    def __getattr__(self, name):
+        if name == 'begin':
+            return self.r.start
+        if name == 'end':
+            return self.r.stop - 1
+        raise AttributeError("PageRange supports 'begin' and 'end' attributes")
+
     def __len__(self):
         return len(self.r)
 
@@ -344,11 +357,17 @@ class PageRange:
         return self.r.__iter__()
 
     def __lt__(self, other):
+        if type(other) is not PageRange:
+            return self.r.start < int(other)
         return self.r.start < other.r.start
 
     def __le__(self, other):
+        if type(other) is not PageRange:
+            return self.r.start <= int(other)
         return self.r.start <= other.r.start
 
     def __eq__(self, other):
+        if type(other) is not PageRange:
+            return self.r.start == int(other)
         return self.r.start == other.r.start
 
