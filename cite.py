@@ -200,11 +200,73 @@ class Cite:
         return output
 
 
-    def to_apa():
+    def to_apa(self):
         output = ''
         
+        if self.authors:
+            for author in self.authors:
+                author.initials=True
+                
         return output 
 
+
+class AuthorIterator:
+    def __init__(self, author):
+        self.i = 0
+        self.chunks = author.name.split()
+        if author.initials:
+            tmp = []
+            for chunk in self.chunks[:-1]:
+                tmp.append(author._to_initials(chunk))
+            tmp.append(self.chunks[-1])
+            self.chunks = tmp
+        self.chunks_len = len(self.chunks)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.i < self.chunks_len:
+            self.i += 1
+            return self.chunks[self.i - 1]
+        else:
+            raise StopIteration()
+
+    def __str__(self):
+        return ' '.join(self.chunks)
+    
+class AuthorReverseIterator:
+    def __init__(self, author):
+        self.author = author
+        self.chunks = author.name.split()
+        tmp = [self.chunks[-1]]
+        for chunk in self.chunks[:-1]:
+            if author.initials:
+                tmp.append(author._to_initials(chunk))
+            else:
+                tmp.append(chunk)
+        self.chunks = tmp
+        self.chunks_len = len(self.chunks)
+        self.i = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.i < self.chunks_len:
+            self.i += 1
+            return self.chunks[self.i - 1]
+        else:
+            raise StopIteration()
+
+    def __str__(self):
+        if self.chunks_len < 1:
+            return ''
+        s = self.chunks[0]
+        if self.chunks_len > 1:
+            s += ', '
+            s += ' '.join(self.chunks[1:]) 
+        return s
 
 # https://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/
 class Author:
@@ -228,15 +290,11 @@ class Author:
         else:
             return self.name
 
+    def __iter__(self):
+        return AuthorIterator(self)
+
     def __reversed__(self):
-        chunks = self.name.split()
-        tmp = [chunks[-1]]
-        if self.initials:
-            for chunk in chunks[:-1]:
-                tmp.append(self._to_initials(chunk))
-        else:
-            tmp.extend(chunks[:-1])
-        return iter(tmp)
+        return AuthorReverseIterator(self)
 
     def _to_initials(self, components):
         if type(components) is not list:
