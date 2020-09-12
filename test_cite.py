@@ -22,7 +22,7 @@ class TestToMLA(unittest.TestCase):
         self.assertEqual(cite.to_mla(), 'James, King. <em>The Bible (Authorized Version).</em> London, 1611.')
         cite.title = 'The Bible'
         cite.subtitle = 'Authorized Version'
-        self.assertEqual(cite.to_mla(), 'James, King. <em>The Bible: Authorized Version</em> London, 1611.')
+        self.assertEqual(cite.to_mla(), 'James, King. <em>The Bible: Authorized Version.</em> London, 1611.')
         
 
     def test_two_authors(self):
@@ -50,9 +50,7 @@ class TestToMLA(unittest.TestCase):
         cite = Cite(title='Incan Mythology', authors=[bs, sp, jm], publisher='Macmillan', year=2002, 
                     larger_title='All the Worlds Mythology', larger_authors=nt)
         self.assertEqual(cite.to_mla(), 'Smith, Bob, Pearson, Sheila, and McDonald, James. "Incan Mythology." All the Worlds Mythology. Neil Tavistock. Macmillan, 2002.')
-        cite.subtitle = 'New Perspectives'
-        cite.larger_subtitle = 'Historical, Religious, and Ethnographical'
-        self.assertEqual(cite.to_mla(), 'Smith, Bob, Pearson, Sheila, and McDonald, James. "Incan Mythology: New Perspectives." All the Worlds Mythology: Historical, Religious, and Ethnographical. Neil Tavistock. Macmillan, 2002.')
+        self.assertEqual(cite.to_mla(), 'Smith, Bob, Pearson, Sheila, and McDonald, James. "Incan Mythology." All the Worlds Mythology. Neil Tavistock. Macmillan, 2002.')
 
         cite.page_ranges=PageRange(25, 31)
         cite.markup = Cite.MARKUP_HTML
@@ -61,7 +59,9 @@ class TestToMLA(unittest.TestCase):
         cite.page_ranges=[PageRange(10, 20), '25-40', 96, '129 - 132']
         cite.markup = Cite.MARKUP_MARKDOWN
         cite.larger_authors_role = 'Edited by'
-        self.assertEqual(cite.to_mla(), 'Smith, Bob, Pearson, Sheila, and McDonald, James. "Incan Mythology." *All the Worlds Mythology.* Edited by Neil Tavistock. Macmillan, 2002. pp. 10-20, 25-40, 96, 129-132.')
+        cite.subtitle = 'New Perspectives'
+        cite.larger_subtitle = 'Historical, Religious, and Ethnographical'
+        self.assertEqual(cite.to_mla(), 'Smith, Bob, Pearson, Sheila, and McDonald, James. "Incan Mythology: New Perspectives." *All the Worlds Mythology: Historical, Religious, and Ethnographical.* Edited by Neil Tavistock. Macmillan, 2002. pp. 10-20, 25-40, 96, 129-132.')
 
 
 # https://apastyle.apa.org/

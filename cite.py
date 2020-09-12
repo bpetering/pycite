@@ -92,7 +92,8 @@ class Cite:
         super().__setattr__(name, value)
 
     def to_mla(self):
-        in_larger = bool(self.larger_title or self.larger_authors or self.larger_authors_role)
+        in_larger = bool(self.larger_title or self.larger_subtitle 
+                         or self.larger_authors or self.larger_authors_role)
         output = ''
         if self.authors:
             except_final_authors = self.authors[:-1]
@@ -119,7 +120,10 @@ class Cite:
                 output += '&ldquo;'
             else:
                 output += '"'
-        output += self.title + '.'
+        output += self.title
+        if self.subtitle:
+            output += ': ' + self.subtitle
+        output += '.'
         if not in_larger:
             output += self.CLOSING_ITALICS[self.markup]
         if in_larger:
@@ -132,6 +136,8 @@ class Cite:
             output += ' '
             output += self.OPENING_ITALICS[self.markup]
             output += self.larger_title
+            if self.larger_subtitle:
+                output += ': ' + self.larger_subtitle
             output += '.'
             output += self.CLOSING_ITALICS[self.markup]
 
