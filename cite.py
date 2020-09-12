@@ -39,15 +39,18 @@ class Cite:
     }
 
     # Plural properties are lists
-    def __init__(self, title, subtitle=None, authors=None, page_ranges=None, 
+    def __init__(self, title, subtitle=None, authors=None, author=None, page_ranges=None, pages=None,
                     city=None, publisher=None, year=None,
-                    larger_title=None, larger_subtitle=None, larger_authors=None, larger_authors_role=None,
+                    larger_title=None, larger_subtitle=None, larger_authors=None, 
+                    larger_author=None, larger_authors_role=None, journal=None,
                     volume=None, issue=None, date=None, url=None, retrieved_date=None,
                     markup=MARKUP_NONE):
         # Careful when adding new attributes because of __setattr__()
         self.title = title
         self.subtitle = subtitle
         self.authors = authors
+        if not authors and author:
+            self.authors = [author]
         self.page_ranges = page_ranges
         self.city = city
         self.publisher = publisher
@@ -55,8 +58,12 @@ class Cite:
 
         # Part of a larger work - a journal, an edited book/anthology, a website
         self.larger_title = larger_title
+        if not larger_title and journal:
+            self.larger_title = journal
         self.larger_subtitle = larger_subtitle
         self.larger_authors = larger_authors
+        if not larger_authors and larger_author:
+            self.larger_authors = [larger_author]
         self.larger_authors_role = larger_authors_role
 
         self.volume = volume
@@ -195,7 +202,7 @@ class Cite:
 
     def to_apa():
         output = ''
-
+        
         return output 
 
 
