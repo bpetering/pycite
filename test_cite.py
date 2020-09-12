@@ -7,6 +7,18 @@ class TestAuthor(unittest.TestCase):
         self.assertEqual(str(a), 'James Brown')
         self.assertEqual(list(reversed(a)), ['Brown', 'James'])
 
+        a.name = 'James Kitchener Brown'
+        self.assertEqual(str(a), 'James Kitchener Brown')
+        a.initials = True
+        self.assertEqual(str(a), 'J. K. Brown')
+        self.assertEqual(list(reversed(a)), ['Brown', 'J.', 'K.'])
+        
+        b = Author(firstname='George', lastname='Michael')
+        self.assertEqual(str(b), 'George Michael')
+        b.initials = True
+        self.assertEqual(str(b), 'G. Michael')
+        self.assertEqual(list(reversed(b)), ['Michael', 'G.'])
+
 # https://guides.lib.uw.edu/c.php?g=341448&p=4076094
 class TestToMLA(unittest.TestCase):
 

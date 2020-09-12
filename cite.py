@@ -225,17 +225,21 @@ class Author:
 
     def __reversed__(self):
         if self.lastname:
-            tmp = [self.lastname]
+            chunks = [self.lastname]
             if self.initials:
-                tmp.append(self._to_initials(self.firstname))
+                chunks.append(self._to_initials(self.firstname))
             else:
-                tmp.append(self.firstname)
+                chunks.append(self.firstname)
         else:
-            tmp = list(reversed(self.name.split()))
+            tmp = self.name.split()
+            chunks = [tmp[-1]]
+            chunks.extend(tmp[:-1])
             if self.initials:
-                for idx, chunk in enumerate(tmp[1:]):
-                    tmp[idx] = self._to_initials(chunk)
-        return iter(tmp)
+                tmp = [chunks[0]]
+                for chunk in chunks[1:]:
+                    tmp.append(self._to_initials(chunk))
+                chunks = tmp
+        return iter(chunks)
 
     def _to_initials(self, components):
         if type(components) is not list:
