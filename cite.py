@@ -41,7 +41,7 @@ class Cite:
     # Plural properties are lists
     def __init__(self, title, subtitle=None, authors=None, page_ranges=None, 
                     city=None, publisher=None, year=None,
-                    larger_title=None, larger_authors=None, larger_authors_role=None,
+                    larger_title=None, larger_subtitle=None, larger_authors=None, larger_authors_role=None,
                     volume=None, issue=None, date=None, url=None, retrieved_date=None,
                     markup=MARKUP_NONE):
         # Careful when adding new attributes because of __setattr__()
@@ -55,6 +55,7 @@ class Cite:
 
         # Part of a larger work - a journal, an edited book/anthology, a website
         self.larger_title = larger_title
+        self.larger_subtitle = larger_subtitle
         self.larger_authors = larger_authors
         self.larger_authors_role = larger_authors_role
 
@@ -68,7 +69,7 @@ class Cite:
 
     def __setattr__(self, name, value):
         supported    = ['title', 'subtitle', 'authors', 'page_ranges', 'city', 'publisher', 'year', 
-                        'larger_title', 'larger_authors', 'larger_authors_role', 
+                        'larger_title', 'larger_subtitle', 'larger_authors', 'larger_authors_role', 
                         'volume', 'issue', 'date', 'url', 'retrieved_date', 
                         'markup']
         if name not in supported:
