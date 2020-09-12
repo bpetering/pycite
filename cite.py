@@ -193,6 +193,12 @@ class Cite:
         return output
 
 
+    def to_apa():
+        output = ''
+
+        return output 
+
+
 class AuthorReversedIter:
     def __init__(self, author):
         self.i = 0
@@ -223,21 +229,32 @@ class AuthorReversedIter:
 class Author:
     """Class for an author"""
 
-    def __init__(self, name=None, firstname=None, lastname=None):
+    def __init__(self, name=None, firstname=None, lastname=None, initials=False):
         if name is None and lastname is None:
             raise TypeError("One of 'name' or 'firstname'/'lastname' is required")
         self.name = name
         self.firstname = firstname
         self.lastname = lastname
+        self.initials = initials
 
     def __str__(self):
         if self.lastname:
-            return self.firstname + ' ' + self.lastname
+            if self.initials:
+                return self._to_initials(self.firstname) + ' ' + self.lastname
+            else:
+                return self.firstname + ' ' + self.lastname
         else:
-            return self.name
+            if self.initials:
+                return '. '.join([self._to_initials(x) for x in self.name.split()[:-1]) 
+                        + ' ' + self.name.split()[-1]
+            else:
+                return self.name
 
     def __reversed__(self):
         return AuthorReversedIter(self)
+
+    def _to_initials(self, components):
+        return '. '.join([upper(x[0]) for x in components])
 
 
 class PageRange:
