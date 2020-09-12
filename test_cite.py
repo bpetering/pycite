@@ -13,11 +13,6 @@ class TestAuthor(unittest.TestCase):
         self.assertEqual(str(a), 'J. K. Brown')
         self.assertEqual(list(reversed(a)), ['Brown', 'J.', 'K.'])
         
-        b = Author(firstname='George', lastname='Michael')
-        self.assertEqual(str(b), 'George Michael')
-        b.initials = True
-        self.assertEqual(str(b), 'G. Michael')
-        self.assertEqual(list(reversed(b)), ['Michael', 'G.'])
 
 # https://guides.lib.uw.edu/c.php?g=341448&p=4076094
 class TestToMLA(unittest.TestCase):
@@ -31,9 +26,6 @@ class TestToMLA(unittest.TestCase):
         self.assertEqual(cite.to_mla(), 'James, King. *The Bible (Authorized Version).*')
         cite.markup = Cite.MARKUP_HTML
         self.assertEqual(cite.to_mla(), 'James, King. <em>The Bible (Authorized Version).</em>')
-        cite.authors = []
-        cite.authors.append(Author(firstname='King', lastname='James'))
-        self.assertEqual(cite.to_mla(), 'James, King. <em>The Bible (Authorized Version).</em>')
         cite.city = 'London'
         self.assertEqual(cite.to_mla(), 'James, King. <em>The Bible (Authorized Version).</em> London.')
         cite.year = 1611
@@ -44,8 +36,8 @@ class TestToMLA(unittest.TestCase):
         
 
     def test_two_authors(self):
-        cd = Author(firstname='Cynthia', lastname='Davis')
-        jb = Author(firstname='Jack', lastname='Brown')
+        cd = Author('Cynthia Davis')
+        jb = Author('Jack Brown')
         cite = Cite('Landscape Gardening', authors=[cd, jb], publisher='Wiley & Sons', year=1994)
         self.assertEqual(cite.to_mla(), 'Davis, Cynthia, and Brown, Jack. Landscape Gardening. Wiley & Sons, 1994.');
         cite.year = None
@@ -61,10 +53,10 @@ class TestToMLA(unittest.TestCase):
 
 
     def test_larger_anthology(self):
-        bs = Author(name='Bob Smith')
-        sp = Author(name='Sheila Pearson')
-        jm = Author(name='James McDonald')
-        nt = Author(firstname='Neil', lastname='Tavistock')
+        bs = Author('Bob Smith')
+        sp = Author('Sheila Pearson')
+        jm = Author('James McDonald')
+        nt = Author('Neil Tavistock')
         cite = Cite(title='Incan Mythology', authors=[bs, sp, jm], publisher='Macmillan', year=2002, 
                     larger_title='All the Worlds Mythology', larger_authors=nt)
         self.assertEqual(cite.to_mla(), 'Smith, Bob, Pearson, Sheila, and McDonald, James. "Incan Mythology." All the Worlds Mythology. Neil Tavistock. Macmillan, 2002.')

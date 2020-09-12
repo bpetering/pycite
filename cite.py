@@ -203,43 +203,33 @@ class Cite:
 class Author:
     """Class for an author"""
 
-    def __init__(self, name=None, firstname=None, lastname=None, initials=False):
-        if name is None and lastname is None:
-            raise TypeError("One of 'name' or 'firstname'/'lastname' is required")
+    def __init__(self, name, initials=False):
         self.name = name
-        self.firstname = firstname
-        self.lastname = lastname
         self.initials = initials
 
+    def __repr__(self):
+        return "Author(name='{}'{})".format(
+            self.name,
+            ', initials=True' if self.initials else ''
+        )
+
     def __str__(self):
-        if self.lastname:
-            if self.initials:
-                return self._to_initials(self.firstname) + ' ' + self.lastname
-            else:
-                return self.firstname + ' ' + self.lastname
+        if self.initials:
+            tmp = self.name.split()
+            initials = [self._to_initials(x) for x in tmp[:-1]]
+            return ' '.join(initials) + ' ' + tmp[-1]
         else:
-            if self.initials:
-                return ' '.join([self._to_initials(x) for x in self.name.split()[:-1]]) + ' ' + self.name.split()[-1]
-            else:
-                return self.name
+            return self.name
 
     def __reversed__(self):
-        if self.lastname:
-            chunks = [self.lastname]
-            if self.initials:
-                chunks.append(self._to_initials(self.firstname))
-            else:
-                chunks.append(self.firstname)
+        chunks = self.name.split()
+        tmp = [chunks[-1]]
+        if self.initials:
+            for chunk in chunks[:-1]:
+                tmp.append(self._to_initials(chunk))
         else:
-            tmp = self.name.split()
-            chunks = [tmp[-1]]
-            chunks.extend(tmp[:-1])
-            if self.initials:
-                tmp = [chunks[0]]
-                for chunk in chunks[1:]:
-                    tmp.append(self._to_initials(chunk))
-                chunks = tmp
-        return iter(chunks)
+            tmp.extend(chunks[:-1])
+        return iter(tmp)
 
     def _to_initials(self, components):
         if type(components) is not list:
