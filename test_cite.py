@@ -51,6 +51,10 @@ class TestToMLA(unittest.TestCase):
         cite.markup = Cite.MARKUP_HTML
         self.assertEqual(cite.to_mla(), 'Davis, Cynthia, and Brown, Jack. <em>Landscape Gardening.</em> Wiley & Sons, 1994.');
 
+    def test_edition(self):
+        cite = Cite(title='17th Century Plays and Playwrights', authors=['William Shakespeare', 'Christopher Marlowe'], edition='98th', year=1620, city='London', publisher='The Globe Theatre Company')
+        self.assertEqual(cite.to_mla(), 'Shakespeare, William, and Marlowe, Christopher. 17th Century Plays and Playwrights. 98th ed. London: The Globe Theatre Company, 1620.')
+
 
     def test_anthology(self):
         bs = Author('Bob Smith')

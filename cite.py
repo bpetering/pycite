@@ -20,7 +20,7 @@ import datetime
 class Cite:
     """Class for any type of citation."""
     SUPPORTED_ATTRS = ('title', 'subtitle', 'authors', 'pages',
-                    'city', 'publisher', 'year', 
+                    'city', 'publisher', 'year', 'edition',
                     'in_title', 'in_subtitle', 'in_authors', 'in_authors_role', 
                     'journal', 'volume', 'issue', 'date', 'url', 'retrieved_date', 
                     'markup')
@@ -45,7 +45,7 @@ class Cite:
 
     # Plural properties are lists
     def __init__(self, title, subtitle=None, authors=None, pages=None,
-                    city=None, publisher=None, year=None,
+                    city=None, publisher=None, year=None, edition=None,
                     in_title=None, in_subtitle=None, in_authors=None, in_authors_role=None, 
                     volume=None, issue=None, date=None, url=None, retrieved_date=None,
                     markup=MARKUP_NONE):
@@ -57,6 +57,7 @@ class Cite:
         self.city = city
         self.publisher = publisher
         self.year = year
+        self.edition = edition
 
         # Whatever contains this work - a newspaper, journal, an edited book/anthology, a website
         self.in_title = in_title
@@ -142,6 +143,10 @@ class Cite:
                 output += ': ' + self.in_subtitle
             output += '.'
             output += self.CLOSING_ITALICS[self.markup]
+
+        if self.edition:
+            output += ' '
+            output += self.edition + ' ed.'
 
         if self.in_authors_role and self.in_authors:
             output += ' '
