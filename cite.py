@@ -262,6 +262,29 @@ class Cite:
 
         return output 
 
+    
+    def to_bibtex(self, strict=False):
+        # TODO use template
+        output = '@'
+        
+        if self.in_title and self.volume:
+            output += 'article' 
+
+        output += '{'
+        output += '  author\t\t= "' + ', '.join([str(x) for x in self.authors]) + '",\n'
+        output += '  title\t\t= ",' + self.title
+        if self.subtitle:
+            output += ': ' + self.subtitle
+        output += '",\n'
+        output += '  journal\t\t= "' + self.in_title + '",\n'
+        if self.year:
+            str_year = str(self.year)
+        elif self.date:
+            str_year = str(self.date.year)
+        if str_year:
+            output += '  year\t\t= "' + str_year + '",\n'
+        output += '}\n'
+
 
 class AuthorIterator:
     def __init__(self, author):
@@ -271,9 +294,9 @@ class AuthorIterator:
             tmp = []
             for chunk in self.chunks[:-1]:
                 tmp.append(author._to_initials(chunk))
-            tmp.append(self.chunks[-1])
+                tmp.append(self.chunks[-1])
             self.chunks = tmp
-        self.chunks_len = len(self.chunks)
+            self.chunks_len = len(self.chunks)
 
     def __iter__(self):
         return self
